@@ -1,11 +1,11 @@
-from django.shortcuts import render
-import requests, json
+from asgiref.sync import async_to_sync
 from nsetools import Nse
-from .models import script
-# Create your views here.
-def watchlist_view(request):
-    context = {}    
+from channels.layers import get_channel_layer
+channel_layer = update_data()
+def update_data():
+    print('in update data')
     nse=Nse()
+    l=[]
     all = script.objects.values()
     for i in all:
         data = nse.get_quote(i['code'])
@@ -22,9 +22,7 @@ def watchlist_view(request):
         i.update(sell_price = data['sellPrice1'])
         i.update(change = data['change'])
         i.update(change_percentage = round((data['change']*100)/data['lastPrice'],2))
-        # i.save()
-    context ={'all':all,}
-    return render(request=request,
-                  template_name="watchlist/markets-light.html",
-                  context=context)
-
+        i.save()
+        l.append(data)
+    async_to_sync(channel_layer.group_send)('stocks',{'type':'send_new_data','text': l})
+        

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'watchlist',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +69,22 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'emarketwatch.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [('localhost', 6379)],
+        },
+    },
+}
+# # ASGI_APPLICATION = "Frames.routing.application"
+
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
+#     }
+# }
 WSGI_APPLICATION = 'emarketwatch.wsgi.application'
 
 

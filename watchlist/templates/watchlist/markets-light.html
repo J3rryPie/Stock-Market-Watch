@@ -14,7 +14,37 @@
         <div class="col-md-12">
           <div class="markets-pair-list">
             <div class="tab-content">
-              <!-- <div class="tab-pane fade show" id="STAR" role="tabpanel"> -->
+                <div id= "log">
+                  test
+                </div>
+                <script>
+                const listsocket = new WebSocket(
+                'ws://'
+                + window.location.host
+                + '/watchlist/'
+                );
+                console.log('123')
+                listsocket.onopen = function() {
+                  console.log('777')
+                  socket.send("hello world");
+                };
+                listsocket.onmessage = function(e) {
+                  console.log('888')
+                  const data = JSON.parse(e.data);
+                  document.querySelector('#log').innerHTML += (data.data + '\n');
+                };
+                if (listsocket.readyState == WebSocket.OPEN) {
+                  console.log('100')
+                  listsocket.onopen();
+                }
+                listsocket.onerror = function(ev)
+                {
+                    // console.log("Socket error: " + ev.data);
+                }
+                listsocket.onclose = function (event) {
+                  console.log(event.code)
+                }
+              </script>
                 <table class="table">
                   <thead>
                     <tr>
@@ -32,24 +62,24 @@
                     {% for i in all %}
                     <tr data-href="exchange-light.html">
                       <td><i class></i>{{i.code}}</td>
-                      {%if i.state is 'up' %}
+                      {%if i.state == 'up' %}
                         <td class="green">{{i.price}}</td>
                         <td class="green">{{i.change}}</td>
                         <td class="green">{{i.change_percentage}}</td>
                       {%endif%}
-                      {%if i.state is 'do' %}
+                      {%if i.state == 'do' %}
                         <td class="red">{{i.price}}</td>
                         <td class="red">{{i.change}}</td>
                         <td class="red">{{i.change_percentage}}</td>
                       {%endif%}
-                      {%if i.state is 'un' %}
+                      {%if i.state == 'un' %}
                         <td>{{i.price}}</td>
                         <td>{{i.change}}</td>
                         <td>{{i.change_percentage}}</td>
                       {%endif%}
-                      <td>{{i.price}}</td>
+                      <!-- <td>{{i.price}}</td>
                         <td>{{i.change}}</td>
-                        <td>{{i.change_percentage}}</td>
+                        <td>{{i.change_percentage}}</td> -->
                       <td>{{i.buy_quantity}}</td>
                       <td>{{i.buy_price}}</td>
                       <td>{{i.sell_quantity}}</td>
