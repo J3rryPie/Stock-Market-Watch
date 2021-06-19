@@ -4,5 +4,5 @@ from django.conf.urls import url
 from .consumer import NSEConsumer
 
 websocket_urlpatterns = [
-    re_path('watchlist/$', NSEConsumer.as_asgi()),
+    re_path('ws/test/', NSEConsumer.as_asgi()),
 ]

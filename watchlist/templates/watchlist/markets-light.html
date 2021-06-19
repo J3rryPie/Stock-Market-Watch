@@ -5,8 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>WatchList</title>
+  <title>EMARKET WATCH</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+  h3 {text-align: center;}
+  </style>
 </head>
 <body>
   <div class="markets ptb70">
@@ -14,37 +17,12 @@
         <div class="col-md-12">
           <div class="markets-pair-list">
             <div class="tab-content">
-                <div id= "log">
-                  test
-                </div>
-                <script>
-                const listsocket = new WebSocket(
-                'ws://'
-                + window.location.host
-                + '/watchlist/'
-                );
-                console.log('123')
-                listsocket.onopen = function() {
-                  console.log('777')
-                  socket.send("hello world");
-                };
-                listsocket.onmessage = function(e) {
-                  console.log('888')
-                  const data = JSON.parse(e.data);
-                  document.querySelector('#log').innerHTML += (data.data + '\n');
-                };
-                if (listsocket.readyState == WebSocket.OPEN) {
-                  console.log('100')
-                  listsocket.onopen();
-                }
-                listsocket.onerror = function(ev)
-                {
-                    // console.log("Socket error: " + ev.data);
-                }
-                listsocket.onclose = function (event) {
-                  console.log(event.code)
-                }
-              </script>
+                <h3 id= "log" >
+                  EMARKET WATCH
+                </h3>
+                <!-- <button id="stop-button">
+                    stop
+                </button> -->
                 <table class="table">
                   <thead>
                     <tr>
@@ -52,40 +30,26 @@
                       <th>Price</th>
                       <th>Change</th>
                       <th>Change Percentage</th>
-                      <th>Buy Volume</th>
-                      <th>Bid Price</th>
-                      <th>Sell Volume</th>
+                      <th>Buy Quantity</th>
+                      <th>Order Price</th>
+                      <th>Sell Quantity</th>
                       <th>Sell Price</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {% for i in all %}
-                    <tr data-href="exchange-light.html">
-                      <td><i class></i>{{i.code}}</td>
-                      {%if i.state == 'up' %}
-                        <td class="green">{{i.price}}</td>
-                        <td class="green">{{i.change}}</td>
-                        <td class="green">{{i.change_percentage}}</td>
-                      {%endif%}
-                      {%if i.state == 'do' %}
-                        <td class="red">{{i.price}}</td>
-                        <td class="red">{{i.change}}</td>
-                        <td class="red">{{i.change_percentage}}</td>
-                      {%endif%}
-                      {%if i.state == 'un' %}
-                        <td>{{i.price}}</td>
-                        <td>{{i.change}}</td>
-                        <td>{{i.change_percentage}}</td>
-                      {%endif%}
-                      <!-- <td>{{i.price}}</td>
-                        <td>{{i.change}}</td>
-                        <td>{{i.change_percentage}}</td> -->
-                      <td>{{i.buy_quantity}}</td>
-                      <td>{{i.buy_price}}</td>
-                      <td>{{i.sell_quantity}}</td>
-                      <td>{{i.sell_price}}</td>
-                    </tr>
-                    {%endfor%}
+                  <tbody id="tb">
+                    <ul id="ul">
+                      <tr data-href="exchange-light.html"></tr>
+                      <tr id="line">
+                        <td id="symbol"><i class></i></td>
+                          <td id = "price"></td>
+                          <td id="change" class="green"></td>
+                          <td id="change_percentage" class="green"></td>                   
+                        <td id = "buy_quantity"></td>
+                        <td id="buy_price"></td>
+                        <td id="sell_quantity"></td>
+                        <td id="sell_price"></td>
+                      </tr>
+                    </ul>
                   </tbody>
                 </table>
               </div>
@@ -97,7 +61,113 @@
       </div>
     </div>
   </div>
+<script>
+               var url = 'ws://127.0.0.1:8000/ws/test/'
+        
+        var socket = new WebSocket(url);
 
+
+        socket.onopen = function(e){
+            console.log('socket connected')
+        }
+
+                socket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                console.log(data.info);
+                document.querySelector('#price').innerHTML = ('');
+                  document.querySelector('#symbol').innerHTML = ('');
+                  document.querySelector('#change').innerHTML = ('');
+                  document.querySelector('#change_percentage').innerHTML = ('');
+                  document.querySelector('#buy_quantity').innerHTML = ('');
+                  document.querySelector('#buy_price').innerHTML = ('');
+                  document.querySelector('#sell_quantity').innerHTML = ('');
+                  document.querySelector('#sell_price').innerHTML = ('');
+                for (i = 0; i < data.info.length ; i++) 
+                {                    
+                      if((data.info[i].change) > 0) {
+                      
+                        document.querySelector('#price').innerHTML += ('<p style="color:green;">'+data.info[i].lastPrice +'</p>');         
+                        document.querySelector('#change').innerHTML += ('<p style="color:green;">'+data.info[i].change + '</p>');
+                        document.querySelector('#change_percentage').innerHTML += ('<p style="color:green;">'+((data.info[i].change)*100/ (data.info[i].lastPrice)).toFixed(2) + '</p>');
+                      }   
+                      else if((data.info[i].change) < 0) {
+                        document.querySelector('#price').innerHTML += ('<p style="color:red;">'+data.info[i].lastPrice + '</p>');         
+                        document.querySelector('#change').innerHTML += ('<p style="color:red;">'+data.info[i].change + '</p>');
+                        document.querySelector('#change_percentage').innerHTML += ('<p style="color:red;">'+((data.info[i].change)*100/ (data.info[i].lastPrice)).toFixed(2) + '</p>');
+                      }  
+                      else {
+                        document.querySelector('#price').innerHTML += (data.info[i].lastPrice + '</p>');         
+                        document.querySelector('#change').innerHTML += (data.info[i].change + '</p>');
+                        document.querySelector('#change_percentage').innerHTML += (((data.info[i].change)*100/ (data.info[i].lastPrice)).toFixed(2) + '</p>');
+                      }          
+                      // document.querySelector('#price').innerHTML += (data.info[i].lastPrice + '<br><br>');
+                      document.querySelector('#symbol').innerHTML += (data.info[i].symbol + '</p>');             
+                      // document.querySelector('#change').innerHTML += (data.info[i].change + '<br><br>');
+                      // document.querySelector('#change_percentage').innerHTML += (((data.info[i].change)*100/ (data.info[i].lastPrice)).toFixed(2) + '<br><br>');
+                      document.querySelector('#buy_quantity').innerHTML += (data.info[i].buyQuantity1 + '</p>');
+                      document.querySelector('#buy_price').innerHTML += (data.info[i].buyPrice1 + '</p>');
+                      document.querySelector('#sell_quantity').innerHTML += (data.info[i].sellQuantity1 + '</p>');
+                      document.querySelector('#sell_price').innerHTML += (data.info[i].sellPrice1 + '</p>');
+                } 
+                console.log('cool')
+                var i;
+                setInterval(function(){ 
+                  document.querySelector('#price').innerHTML = ('');
+                  document.querySelector('#symbol').innerHTML = ('');
+                  document.querySelector('#change').innerHTML = ('');
+                  document.querySelector('#change_percentage').innerHTML = ('');
+                  document.querySelector('#buy_quantity').innerHTML = ('');
+                  document.querySelector('#buy_price').innerHTML = ('');
+                  document.querySelector('#sell_quantity').innerHTML = ('');
+                  document.querySelector('#sell_price').innerHTML = ('');
+                    for (i = 0; i < data.info.length ; i++) 
+                    {  
+                      if((data.info[i].change) > 0) {
+                      
+                        document.querySelector('#price').innerHTML += ('<p style="color:green;">'+data.info[i].lastPrice +'</p>');         
+                        document.querySelector('#change').innerHTML += ('<p style="color:green;">'+data.info[i].change + '</p>');
+                        document.querySelector('#change_percentage').innerHTML += ('<p style="color:green;">'+((data.info[i].change)*100/ (data.info[i].lastPrice)).toFixed(2) + '</p>');
+                      }   
+                      else if((data.info[i].change) < 0) {
+                        document.querySelector('#price').innerHTML += ('<p style="color:red;">'+data.info[i].lastPrice + '</p>');         
+                        document.querySelector('#change').innerHTML += ('<p style="color:red;">'+data.info[i].change + '</p>');
+                        document.querySelector('#change_percentage').innerHTML += ('<p style="color:red;">'+((data.info[i].change)*100/ (data.info[i].lastPrice)).toFixed(2) + '</p>');
+                      }  
+                      else {
+                        document.querySelector('#price').innerHTML += (data.info[i].lastPrice + '</p>');         
+                        document.querySelector('#change').innerHTML += (data.info[i].change + '</p>');
+                        document.querySelector('#change_percentage').innerHTML += (((data.info[i].change)*100/ (data.info[i].lastPrice)).toFixed(2) + '</p>');
+                      }          
+                      document.querySelector('#symbol').innerHTML += (data.info[i].symbol + '</p>');                           
+                      document.querySelector('#buy_quantity').innerHTML += (data.info[i].buyQuantity1 + '</p>');
+                      document.querySelector('#buy_price').innerHTML += (data.info[i].buyPrice1 + '</p>');
+                      document.querySelector('#sell_quantity').innerHTML += (data.info[i].sellQuantity1 + '</p>');
+                      document.querySelector('#sell_price').innerHTML += (data.info[i].sellPrice1 + '</p>');
+                    }
+                  console.log('blank')
+                   }, 60000);
+                  }
+                
+                // if (socket.readyState == WebSocket.OPEN) {
+                //   console.log('100')
+                //   socket.onopen();
+                // }
+                socket.onerror = function(ev)
+                {
+                    // console.log("Socket error: " + ev.data);
+                }
+                // var buttonStop = document.getElementById("stop-button");
+
+                // buttonStop.onclick = function() {
+                //   // Close the connection, if open.
+                //   if (socket.readyState === WebSocket.OPEN) {
+                //       socket.close();
+                //   }
+                // }
+                                socket.onclose = function (event) {
+                  console.log(event.code)
+                }
+              </script>
   <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
   <script src="{% static 'js/popper.min.js' %}"></script>
   <script src="{% static 'js/bootstrap.min.js' %}"></script>
